@@ -1,0 +1,39 @@
+= Example Groovy Notebook
+:toc: left
+:toclevels: 4
+:source-highlighter: coderay
+:numbered:
+
+== Numbers
+
+Groovy can easily be used to calculate:
+
+[groovy]
+5+8
+
+it even can cope with high precision since it uses BigDecimals
+
+[groovy]
+1024.0*1024.0*1024.0*1024.0*1024.0
+
+or to display the current date and time:
+
+[groovy]
+new Date()
+
+== Strings
+
+Multi-Line statements do also work:
+
+.Simple Hello-World
+[groovy]
+b="binding?"
+a = "hello \n"
+a += "world"
+
+[groovy]
+println a
+a+" test binding"+b
+
+
+If an ssertion fails, what do we get?
