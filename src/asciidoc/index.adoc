@@ -9,7 +9,7 @@
 Groovy can easily be used to calculate:
 
 [groovy]
-5+8
+5+30
 
 it even can cope with high precision since it uses BigDecimals
 
@@ -27,7 +27,7 @@ Multi-Line statements do also work:
 
 .Simple Hello-World
 [groovy]
-b="binding?"
+b="binding?" 
 a = "hello \n"
 a += "world"
 
@@ -36,4 +36,3 @@ println a
 a+" test binding"+b
 
 
-If an ssertion fails, what do we get?
