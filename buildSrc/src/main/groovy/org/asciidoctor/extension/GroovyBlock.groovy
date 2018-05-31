@@ -1,33 +1,72 @@
 package org.asciidoctor.extension
 
+import org.asciidoctor.ast.Block
+import org.asciidoctor.ast.Document
 import org.asciidoctor.extension.BlockProcessor
 import org.asciidoctor.ast.AbstractBlock
 import org.asciidoctor.extension.Reader
 
-class GroovyBlock extends BlockProcessor {
+class GroovyBlock extends Preprocessor {
 
     private static binding = new Binding()
 
-    GroovyBlock(String name, Map<String, Object> config) {
-        super(name, [contexts: [':paragraph'], content_model: ':verbatim'])
+    static final TAG = 'groovy'
+
+    GroovyBlock( Map<String, Object> config) {
+        super(config)
         binding.context = [:]
     }
 
-    def process(AbstractBlock parent, Reader reader, Map<String, Object> attributes) {
-        def code = reader.lines().join("\n")
+    void executeAndAppend(List<String> code, List<String> lines){
         def shell = new GroovyShell(binding)
-        def result = shell.evaluate(code)
+        def result = shell.evaluate(code.join('\n'))
 
-        //second parameter is "context" which seems to take one of
-        //these values: https://github.com/asciidoctor/asciidoctor/blob/master/lib/asciidoctor/block.rb#L14
+        lines << '.source'
+        lines << '[source,groovy]'
+        code.each{ line ->
+            lines << line
+        }
+        lines << ' '
+        lines << '.result'
+        lines << '[source,console]'
+        "$result".split('\n').each{
+            lines << it
+        }
+        lines << ' '
+    }
 
-        def codeblock = createBlock(parent, 'listing', "$code", [:],[:])
-        parent.blocks().add(codeblock)
+    PreprocessorReader process(Document document, PreprocessorReader reader) {
+        List<String> lines = reader.readLines();
 
-        def resultBlock = createBlock(parent, 'listing', "$result", [:], [:])
-        parent.blocks().add(resultBlock)
+        List<String> newLines = new ArrayList<>();
+        for(int i=0; i<lines.size(); i++){
+            String line = lines[i];
+            if( line.startsWith("[$TAG") && line.endsWith(']')){
+                List<String> code = []
+                for( ++i; i<lines.size(); i++){
+                    if( lines[i].trim().length() ==0)
+                        break
+                    code << lines[i]
+                }
+                newLines << line
+                newLines << ' '
+                executeAndAppend( code, newLines)
+                continue
+            }
+            if (line.trim().length() == 0) {
+                newLines << ' '
+                continue
+            }
+            newLines << line
+        }
 
-        null
+        def attributes = [:]
+        newLines.reverseEach {line->
+            reader.push_include( line, null, null, 1, attributes);
+        }
+
+
+        reader
     }
 
 
