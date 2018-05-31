@@ -5,6 +5,6 @@ import org.asciidoctor.extension.spi.ExtensionRegistry
 
 class GroovyBlockExtensionRegistry implements ExtensionRegistry {
     void register(Asciidoctor asciidoctor) {
-        asciidoctor.javaExtensionRegistry().block 'groovy', GroovyBlock
+        asciidoctor.javaExtensionRegistry().preprocessor GroovyBlock
     }
 }
